@@ -65,17 +65,4 @@ void MaFenetre::on_card_btn_clicked()
     
         }
 
-       
-        uint32_t value;
-        status = Mf_Classic_Read_Value(&reader, true, 14, &value, true, 3);
-        qDebug() << (status == MI_OK);
-        if (status == MI_OK) {
-            //
-            qDebug() << value;
-        }
-        // read sectors (using key 1, 2 and 3)
-        //status = Mf_Classic_Read_Block(&reader, TRUE, 0, data, true, 0);
-        //status = Mf_Classic_Read_Block(&reader, TRUE, 5, data, true, 0);
-        //qDebug() << (status == MI_OK);
-    }
-}
+    
