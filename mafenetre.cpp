@@ -129,20 +129,7 @@ void MaFenetre::on_card_btn_clicked()
             qDebug() << "error: could not read last name";
         }
 
-        // read counter value
-        uint32_t value;
-        status = Mf_Classic_Read_Value(&MonLecteur, true, 14, &value, key_a, 3); // block 14, sector 3
-        if (status == MI_OK) {
-            ui->counter_edit->setText(QString::number(value));
-        } else {
-            qDebug() << "error: could not read counter value";
-        }
-
-        LEDBuzzer(&MonLecteur, LED_GREEN_ON + BUZZER_OFF);
-    } else {
-        qDebug() << "error: could not read card";
-    }
-}
+       
 
 
 
@@ -211,7 +198,7 @@ void MaFenetre::on_leave_clicked()
 {
     int16_t status = MI_OK;
     RF_Power_Control(&MonLecteur, FALSE, 0);
-    status = LEDBuzzer(&MonLecteur,);
+    status = LEDBuzzer(&MonLecteur,LED_OFF);
     status = CloseCOM(&MonLecteur);
     qApp->quit();
 
