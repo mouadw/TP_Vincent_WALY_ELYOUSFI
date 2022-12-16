@@ -91,7 +91,10 @@ void MaFenetre::on_card_btn_clicked()
     uint16_t uidlen = 12;
     status = ISO14443_3_A_PollCard(&MonLecteur, atq, sak, uid, &uidlen);
 
-    
+    // sectors 2 and 3 are encrypted
+    // sector 2 requires key 2, sector 3 requires key 3
+    // other sectors can be read with key 0
+
     // Mf_Classic_Read_Block/Value(reader=&MonLecteur, auth=true, block, out=data, readkey=key_a|key_b, keynum)
     // out is uint8_t[16] for blocks
 
@@ -129,7 +132,20 @@ void MaFenetre::on_card_btn_clicked()
             qDebug() << "error: could not read last name";
         }
 
-       
+        // read counter value
+        uint32_t value;
+        status = Mf_Classic_Read_Value(&MonLecteur, true, 14, &value, key_a, 3); // block 14, sector 3
+        if (status == MI_OK) {
+            ui->counter_edit->setText(QString::number(value));
+        } else {
+            qDebug() << "error: could not read counter value";
+        }
+
+        LEDBuzzer(&MonLecteur, LED_GREEN_ON + BUZZER_OFF);
+    } else {
+        qDebug() << "error: could not read card";
+    }
+}
 
 
 
@@ -191,16 +207,30 @@ void MaFenetre::on_update_identity_btn_clicked()
     }
 
 
-   
+    // last name
+    QString lastname = ui->lastname_edit->text();
+    i = 0;
+    while (i < lastname.size()) {
+        data[i] = lastname.at(i).toLatin1();
+        i++;
+    }
+    while (i < 16) {
+        data[i] = 0;
+        i++;
+    }
+    status = Mf_Classic_Write_Block(&MonLecteur, true, 10, data, key_b, 2);
+    if(status != MI_OK) {
+        qDebug() << "error: could not write last name";
+    }
+}
 
 
 void MaFenetre::on_leave_clicked()
 {
     int16_t status = MI_OK;
     RF_Power_Control(&MonLecteur, FALSE, 0);
-    status = LEDBuzzer(&MonLecteur,LED_OFF);
+    status = LEDBuzzer(&MonLecteur, LED_OFF);
     status = CloseCOM(&MonLecteur);
     qApp->quit();
 
 }
-
